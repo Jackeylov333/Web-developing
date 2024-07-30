@@ -9,7 +9,7 @@ let tasks = {
         items: [
             {
                 id: fetchID(),
-                title: "Send the Figma file to Dima",
+                title: "Travelling to interesting places",
                 comments: [],
             },
         ],
@@ -19,11 +19,11 @@ let tasks = {
         items: [
             {
                 id: fetchID(),
-                title: "Review GitHub issues",
+                title: "Finish Lesson Web's Homework",
                 comments: [
                     {
-                        name: "David",
-                        text: "Ensure you review before merging",
+                        name: "Cyy",
+                        text: "Keep Going!",
                         id: fetchID(),
                     },
                 ],
@@ -35,11 +35,11 @@ let tasks = {
         items: [
             {
                 id: fetchID(),
-                title: "Create technical contents",
+                title: "School Life of Grade 1 in NJU",
                 comments: [
                     {
-                        name: "Dima",
-                        text: "Make sure you check the requirements",
+                        name: "Cyy",
+                        text: "A Nice Year!!!",
                         id: fetchID(),
                     },
                 ],
@@ -77,63 +77,83 @@ socketIO.on('connection', (socket) => {
         socket.emit("tasks", tasks);
     });
 
+    // 处理客户端发送的删除任务事件
+    socket.on('deleteTask', async ({ taskId, category }) => {
+        try {
+            // 在 tasks 对象中找到并删除任务
+            for (let key in tasks) {
+                if (tasks[key].title === category) {
+                    const index = tasks[key].items.findIndex(item => item.id === taskId);
+                    if (index !== -1) {
+                        tasks[key].items.splice(index, 1);
+                    }
+                }
+            }
+
+            // 通知所有客户端更新任务列表
+            socket.emit('tasks', tasks);
+        } catch (error) {
+            console.error('Error deleting task:', error);
+        }
+    });
+    
+    socket.on("taskDragged", (data) => {
+        const { source, destination } = data;
+
+        //👇🏻 Gets the item that was dragged
+        const itemMoved = {
+            ...tasks[source.droppableId].items[source.index],
+        };
+        console.log("DraggedItem>>> ", itemMoved);
+
+        //👇🏻 Removes the item from the its source
+        tasks[source.droppableId].items.splice(source.index, 1);
+
+        //👇🏻 Add the item to its destination using its destination index
+        tasks[destination.droppableId].items.splice(destination.index, 0, itemMoved);
+
+        //👇🏻 Sends the updated tasks object to the React app
+        socket.emit("tasks", tasks);
+
+        /* 👇🏻 Print the items at the Source and Destination
+            console.log("Source >>>", tasks[source.droppableId].items);
+            console.log("Destination >>>", tasks[destination.droppableId].items);
+            */
+    });
+
+    socket.on("addComment", (data) => {
+        const { category, userId, comment, id } = data;
+        //👇🏻 Gets the items in the task's category
+        const taskItems = tasks[category].items;
+        //👇🏻 Loops through the list of items to find a matching ID
+        for (let i = 0; i < taskItems.length; i++) {
+            if (taskItems[i].id === id) {
+        //👇🏻 Then adds the comment to the list of comments under the item (task)
+                taskItems[i].comments.push({
+                    name: userId,
+                    text: comment,
+                    id: fetchID(),
+                });
+                //👇🏻 sends a new event to the React app
+                socket.emit("comments", taskItems[i].comments);
+            }
+        }
+    });
+
+    socket.on("fetchComments", (data) => {
+        const { category, id } = data;
+        const taskItems = tasks[category].items;
+        for (let i = 0; i < taskItems.length; i++) {
+            if (taskItems[i].id === id) {
+                socket.emit("comments", taskItems[i].comments);
+            }
+        }
+    });
+    
     socket.on('disconnect', () => {
             socket.disconnect()
       console.log('🔥: A user disconnected');
     });
-});
-
-socketIO.on("taskDragged", (data) => {
-    const { source, destination } = data;
-
-    //👇🏻 Gets the item that was dragged
-    const itemMoved = {
-        ...tasks[source.droppableId].items[source.index],
-    };
-    console.log("DraggedItem>>> ", itemMoved);
-
-    //👇🏻 Removes the item from the its source
-    tasks[source.droppableId].items.splice(source.index, 1);
-
-    //👇🏻 Add the item to its destination using its destination index
-    tasks[destination.droppableId].items.splice(destination.index, 0, itemMoved);
-
-    //👇🏻 Sends the updated tasks object to the React app
-    socket.emit("tasks", tasks);
-
-    /* 👇🏻 Print the items at the Source and Destination
-        console.log("Source >>>", tasks[source.droppableId].items);
-        console.log("Destination >>>", tasks[destination.droppableId].items);
-        */
-});
-
-socketIO.on("addComment", (data) => {
-    const { category, userId, comment, id } = data;
-    //👇🏻 Gets the items in the task's category
-    const taskItems = tasks[category].items;
-    //👇🏻 Loops through the list of items to find a matching ID
-    for (let i = 0; i < taskItems.length; i++) {
-        if (taskItems[i].id === id) {
-    //👇🏻 Then adds the comment to the list of comments under the item (task)
-            taskItems[i].comments.push({
-                name: userId,
-                text: comment,
-                id: fetchID(),
-            });
-            //👇🏻 sends a new event to the React app
-            socket.emit("comments", taskItems[i].comments);
-        }
-    }
-});
-
-socketIO.on("fetchComments", (data) => {
-    const { category, id } = data;
-    const taskItems = tasks[category].items;
-    for (let i = 0; i < taskItems.length; i++) {
-        if (taskItems[i].id === id) {
-            socket.emit("comments", taskItems[i].comments);
-        }
-    }
 });
 
 app.get("/api", (req, res) => {

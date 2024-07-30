@@ -1,0 +1,28 @@
+name: Continuous Integration
+
+on: [push]  # 触发工作流的事件，这里是在 push 事件时触发
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # 定义运行作业的虚拟机环境
+
+    steps:
+    - uses: actions/checkout@v3  # 检出代码仓库
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'  # 指定 Node.js 版本
+
+    - name: Install dependencies
+      run: npm install  # 安装项目依赖
+
+    - name: Run tests
+      run: npm test  # 运行自动化测试
+
+    - name: ESLint
+      run: npm run lint
+
+    - name: Deploy to Test Environment
+      run: npm start
+    # 部署脚本或命令
