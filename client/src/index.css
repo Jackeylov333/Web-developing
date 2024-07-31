@@ -12,9 +12,9 @@ body {
 }
 .navbar {
     width: 100%;
-    background-color: #f1f7ee;
+    background-color: #eef7f7;
     height: 10vh;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #dddddd;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -48,6 +48,8 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px;
+    background: url("D:\Desktop\src\Web-developing\client\src\pictures\preview.jpg") no-repeat center center fixed; 
+    background-size: cover; 
 }
 
 .completed__wrapper,
