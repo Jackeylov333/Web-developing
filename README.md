@@ -2,9 +2,8 @@
 ## github项目仓库地址：https://github.com/Jackeylov333/Web-developing.git
 
 ## 运行要求
-1. Node.js版本：v20.15.1
-2. 操作系统：Windows 11
-3. 双击文件夹中的“看板软件”快捷方式，等待依赖安装完成后即可进入客户端。
+1. 操作系统：Windows(x64)
+2. 项目用pkg打包，双击文件夹中的APP.exe即可启动。
 
 ## 使用要点
 1. 在登录界面输入用户名登录；

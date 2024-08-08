@@ -1,6 +1,16 @@
 {
+  "main": "start.js",
+  "bin": "start.js",
   "scripts": {
     "start": "concurrently \"cd server && npm install && npm start\" \"cd client && npm install && npm start\""
+  },
+  "pkg": {
+    "assets": [
+      "client/build/**/*", 
+      "server/views/**/*",
+      ".github/**/*",
+      "start.js"
+    ]
   },
   "dependencies": {
     "cors": "^2.8.5",
